@@ -39,12 +39,14 @@ public class MakePurchaseFunction extends BaseFunction
 			Extension.context.dispatchStatusEventAsync("PURCHASE_ERROR", "ERROR");
 			return null;
 		}
-		
 		Extension.log("Making purchase with ID: " + purchaseId);
-		
+
+		String developerPayload = getStringFromFREObject(args[1]);
+
 		Intent i = new Intent(context.getActivity().getApplicationContext(), BillingActivity.class);
 		i.putExtra("type", BillingActivity.MAKE_PURCHASE);
 		i.putExtra("purchaseId", purchaseId);
+		i.putExtra("developerPayload", developerPayload);
 		context.getActivity().startActivity(i);
 
 		return null;

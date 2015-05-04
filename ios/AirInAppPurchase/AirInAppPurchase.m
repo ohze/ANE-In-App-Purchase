@@ -130,7 +130,7 @@ void *AirInAppRefToSelf;
     [data setValue:receiptString forKey:@"receipt"];
     [data setValue:@"AppStore"   forKey:@"receiptType"];
     
-    FREDispatchStatusEventAsync(AirInAppCtx, (uint8_t*)"PURCHASE_SUCCESSFUL", (uint8_t*)[[data JSONString] UTF8String]); 
+    FREDispatchStatusEventAsync(AirInAppCtx, (uint8_t*)"PURCHASE_SUCCESS", (uint8_t*)[[data JSONString] UTF8String]);
 }
 
 // transaction failed, remove the transaction from the queue.

@@ -45,7 +45,7 @@ public class GetProductsInfoFunction extends BaseFunction
     			Extension.log("Query inventory successful");
     			
     			String data = inventory != null ? inventory.toString() : "";
-    	        Extension.context.dispatchStatusEventAsync("PRODUCT_INFO_RECEIVED", data) ;
+    	        Extension.context.dispatchStatusEventAsync("PRODUCT_INFO_SUCCESS", data) ;
     		}
     		else
     		{
@@ -62,8 +62,8 @@ public class GetProductsInfoFunction extends BaseFunction
 		
 		List<String> skusName = getListOfStringFromFREArray((FREArray)args[0]);
 		List<String> skusSubsName = getListOfStringFromFREArray((FREArray)args[1]);
-		
-		Extension.context.getIabHelper().queryInventoryAsync(true , skusName, skusSubsName, listener);
+
+		Extension.context.getIabHelper().queryInventoryAsync(true , skusName, skusSubsName.isEmpty() ? null : skusSubsName, listener);
 		
 		return null;
 	}

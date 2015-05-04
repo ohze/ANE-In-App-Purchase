@@ -22,10 +22,15 @@ package com.freshplanet.ane.AirInAppPurchase
 	
 	public class InAppPurchaseEvent extends Event
 	{
-		
+
+		public static const INIT_SUCCESS:String = "initSuccess";
+		public static const INIT_ERROR:String   = "initError";
+
 		// init -> check if previously purchases not being processed by the app
-		public static const PURCHASE_SUCCESSFULL:String = "purchaseSuccesfull";
+		public static const PURCHASE_SUCCESS:String = "purchaseSuccess";
 		public static const PURCHASE_ERROR:String   	= "purchaseError";
+		public static const PURCHASE_ALREADY_OWNED:String = "purchaseAlreadyOwner";
+
 		
 		// user can make a purchase
 		public static const PURCHASE_ENABLED:String = "purchaseEnabled";
@@ -37,13 +42,17 @@ package com.freshplanet.ane.AirInAppPurchase
 		// user cannot make a subscription
 		public static const SUBSCRIPTION_DISABLED:String = "subsDisabled";
 
-		
-		
-		public static const PRODUCT_INFO_RECEIVED:String = "productInfoReceived";
+		public static const PRODUCT_INFO_SUCCESS:String = "productInfoSuccess";
 		public static const PRODUCT_INFO_ERROR:String = "productInfoError";
 
-		public static const RESTORE_INFO_RECEIVED:String = "restoreInfoReceived";
-		
+		public static const RESTORE_SUCCESS:String = "restoreSuccess";
+		public static const RESTORE_ERROR:String = "restoreError";
+
+		public static const CONSUME_SUCCESS:String = "restoreSuccess";
+		public static const CONSUME_ERROR:String = "restoreError";
+
+
+
 		// json encoded string (if any)
 		public var data:String;
 		
