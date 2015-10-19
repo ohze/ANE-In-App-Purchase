@@ -87,11 +87,11 @@ public class ExtensionContext extends FREContext implements IabHelper.OnIabSetup
     	if (result.isSuccess())
     	{
     		Extension.log("Initialized IAB Helper successfully");
-        }
-    	else
-    	{
+			dispatchStatusEventAsync("INIT_SUCCESS", "SUCCESS");
+		} else {
     		Extension.log("Failed to initialize IAB Helper: " + result.getMessage());
-    	}
+			dispatchStatusEventAsync("INIT_ERROR", result.getMessage());
+		}
     }
 	
 	public void onConsumeFinished(Purchase purchase, IabResult result)
@@ -99,10 +99,12 @@ public class ExtensionContext extends FREContext implements IabHelper.OnIabSetup
 		if (result.isSuccess())
 		{
 			Extension.log("Successfully consumed: " + purchase);
+			dispatchStatusEventAsync("CONSUME_SUCCESS", purchase.getSku());
 		}
 		else
 		{
 			Extension.log("Failed to consume: " + purchase + ". Error: " + result.getMessage());
+			dispatchStatusEventAsync("CONSUME_ERROR", result.getMessage());
 		}
     }
 	
@@ -112,12 +114,12 @@ public class ExtensionContext extends FREContext implements IabHelper.OnIabSetup
 		{
 			Extension.log("Query inventory successful: " + inventory);
 			String data = inventory != null ? inventory.toString() : "";
-	        dispatchStatusEventAsync("RESTORE_INFO_RECEIVED", data) ;
+	        dispatchStatusEventAsync("RESTORE_SUCCESS", data) ;
 		}
 		else
 		{
 			Extension.log("Failed to query inventory: " + result.getMessage());
-			dispatchStatusEventAsync("PRODUCT_INFO_ERROR", "ERROR");
+			dispatchStatusEventAsync("RESTORE_ERROR", "ERROR");
 		}
     }
 }

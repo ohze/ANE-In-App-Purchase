@@ -68,12 +68,12 @@ package com.freshplanet.ane.AirInAppPurchase
 			}
 		}
 		
-		public function makePurchase(productId:String ):void
+		public function makePurchase(productId:String, developerPayload: String = ""):void
 		{
 			if (this.isInAppPurchaseSupported)
 			{
-				trace("[InAppPurchase] purchasing", productId);
-				extCtx.call("makePurchase", productId);
+				trace("[InAppPurchase] purchasing", productId, developerPayload);
+				extCtx.call("makePurchase", productId, developerPayload);
 			} else
 			{
 				this.dispatchEvent(new InAppPurchaseEvent(InAppPurchaseEvent.PURCHASE_ERROR, "InAppPurchase not supported"));
@@ -169,7 +169,7 @@ package com.freshplanet.ane.AirInAppPurchase
 			{
 				var jsonPurchases:String = "[" + _iosPendingPurchases.join(",") + "]";
 				var jsonData:String = "{ \"purchases\": " + jsonPurchases + "}";
-				dispatchEvent(new InAppPurchaseEvent(InAppPurchaseEvent.RESTORE_INFO_RECEIVED, jsonData));
+				dispatchEvent(new InAppPurchaseEvent(InAppPurchaseEvent.RESTORE_SUCCESS, jsonData));
 			}
 		}
 
@@ -195,19 +195,22 @@ package com.freshplanet.ane.AirInAppPurchase
 		
 		private function onStatus(event:StatusEvent):void
 		{
-			trace(event);
+			//trace(event);
 			var e:InAppPurchaseEvent;
 			switch(event.code)
 			{
-				case "PRODUCT_INFO_RECEIVED":
-					e = new InAppPurchaseEvent(InAppPurchaseEvent.PRODUCT_INFO_RECEIVED, event.level);
+				case "PRODUCT_INFO_SUCCESS":
+					e = new InAppPurchaseEvent(InAppPurchaseEvent.PRODUCT_INFO_SUCCESS, event.level);
 					break;
-				case "PURCHASE_SUCCESSFUL":
+				case "PRODUCT_INFO_ERROR":
+					e = new InAppPurchaseEvent(InAppPurchaseEvent.PRODUCT_INFO_ERROR);
+					break;
+				case "PURCHASE_SUCCESS":
 					if (Capabilities.manufacturer.indexOf("iOS") > -1)
 					{
 						_iosPendingPurchases.push(event.level);
 					}
-					e = new InAppPurchaseEvent(InAppPurchaseEvent.PURCHASE_SUCCESSFULL, event.level);
+					e = new InAppPurchaseEvent(InAppPurchaseEvent.PURCHASE_SUCCESS, event.level);
 					break;
 				case "PURCHASE_ERROR":
 					e = new InAppPurchaseEvent(InAppPurchaseEvent.PURCHASE_ERROR, event.level);
@@ -218,17 +221,26 @@ package com.freshplanet.ane.AirInAppPurchase
 				case "PURCHASE_DISABLED":
 					e = new InAppPurchaseEvent(InAppPurchaseEvent.PURCHASE_DISABLED, event.level);
 					break;
-				case "PRODUCT_INFO_ERROR":
-					e = new InAppPurchaseEvent(InAppPurchaseEvent.PRODUCT_INFO_ERROR);
-					break;
 				case "SUBSCRIPTION_ENABLED":
 					e = new InAppPurchaseEvent(InAppPurchaseEvent.SUBSCRIPTION_ENABLED);
 					break;
 				case "SUBSCRIPTION_DISABLED":
 					e = new InAppPurchaseEvent(InAppPurchaseEvent.SUBSCRIPTION_DISABLED);
 					break;
-				case "RESTORE_INFO_RECEIVED":
-					e = new InAppPurchaseEvent(InAppPurchaseEvent.RESTORE_INFO_RECEIVED, event.level);
+				case "RESTORE_SUCCESS":
+					e = new InAppPurchaseEvent(InAppPurchaseEvent.RESTORE_SUCCESS, event.level);
+					break;
+				case "RESTORE_ERROR":
+					e = new InAppPurchaseEvent(InAppPurchaseEvent.RESTORE_ERROR);
+					break;
+				case "CONSUME_SUCCESS":
+					e = new InAppPurchaseEvent(InAppPurchaseEvent.CONSUME_SUCCESS);
+					break;
+				case "CONSUME_ERROR":
+					e = new InAppPurchaseEvent(InAppPurchaseEvent.CONSUME_ERROR);
+					break;
+				case "PURCHASE_ALREADY_OWNED":
+					e = new InAppPurchaseEvent(InAppPurchaseEvent.PURCHASE_ALREADY_OWNED, event.level);
 					break;
 				default:
 				

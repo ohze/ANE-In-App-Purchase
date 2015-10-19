@@ -36,12 +36,13 @@ public class BillingActivity extends Activity implements IabHelper.OnIabPurchase
 		Bundle extras = getIntent().getExtras();
 		String type = extras.getString("type");
 		String purchaseId = extras.getString("purchaseId");
+		String developerPayload = extras.getString("developerPayload");
 
 		if (type.equals(MAKE_PURCHASE))
 		{
 			try
 			{
-				Extension.context.getIabHelper().launchPurchaseFlow(this, purchaseId, RC_REQUEST, this, null);
+				Extension.context.getIabHelper().launchPurchaseFlow(this, purchaseId, RC_REQUEST, this, developerPayload);
 			}
 			catch (IllegalStateException e)
 			{
@@ -150,7 +151,7 @@ public class BillingActivity extends Activity implements IabHelper.OnIabPurchase
             	resultObject.put("productId", purchase.getSku());
             	resultObject.put("receipt", receiptObject);
             	resultObject.put("receiptType", "GooglePlay");
-            	Extension.context.dispatchStatusEventAsync("PURCHASE_SUCCESSFUL", resultObject.toString());
+            	Extension.context.dispatchStatusEventAsync("PURCHASE_SUCCESS", resultObject.toString());
             }
             catch (JSONException e)
             {
@@ -161,8 +162,12 @@ public class BillingActivity extends Activity implements IabHelper.OnIabPurchase
         else
         {
         	Extension.log("Purchase error: " + result.getMessage());
-        	Boolean isCancel = (result.getResponse() == IabHelper.IABHELPER_USER_CANCELLED);
-        	Extension.context.dispatchStatusEventAsync("PURCHASE_ERROR", isCancel ? "RESULT_USER_CANCELED" : result.getMessage());
+			if (result.getResponse() == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED){
+				Extension.context.dispatchStatusEventAsync("PURCHASE_ALREADY_OWNED", result.getMessage());
+			}else {
+				Boolean isCancel = (result.getResponse() == IabHelper.IABHELPER_USER_CANCELLED);
+				Extension.context.dispatchStatusEventAsync("PURCHASE_ERROR", isCancel ? "RESULT_USER_CANCELED" : result.getMessage());
+			}
         }
         finish();
     }
