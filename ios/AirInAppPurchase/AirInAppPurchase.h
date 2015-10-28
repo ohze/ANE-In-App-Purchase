@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 #import <StoreKit/StoreKit.h>
 #import "FlashRuntimeExtensions.h"
-#import "JSONKit.h"
+//#import "JSONKit.h"
 
 @interface AirInAppPurchase : NSObject <SKPaymentTransactionObserver, SKProductsRequestDelegate>
 

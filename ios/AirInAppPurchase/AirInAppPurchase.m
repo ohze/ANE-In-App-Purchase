@@ -17,30 +17,44 @@
 //////////////////////////////////////////////////////////////////////////////////////
 
 #import "AirInAppPurchase.h"
+#import "NSData+Base64.h"
 
 FREContext AirInAppCtx = nil;
 
-void *AirInAppRefToSelf;
+//void *AirInAppRefToSelf;
 
 #define DEFINE_ANE_FUNCTION(fn) FREObject (fn)(FREContext context, void* functionData, uint32_t argc, FREObject argv[])
 
 
 @implementation AirInAppPurchase
 
-- (id) init
+static AirInAppPurchase *sharedInstance = nil;
+
++(AirInAppPurchase *)sharedInstance
 {
-    self = [super init];
-    if (self)
+    if (sharedInstance == nil)
     {
-        AirInAppRefToSelf = self;
+        sharedInstance = [[super alloc] init];
+        [sharedInstance registerObserver];
     }
-    return self;
+    return sharedInstance;
 }
+
+//- (id) init
+//{
+//    self = [super init];
+//    if (self)
+//    {
+//        AirInAppRefToSelf = self;
+//    }
+//    return self;
+//}
 
 -(void)dealloc
 {
     [[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
-    AirInAppRefToSelf = nil;
+//    AirInAppRefToSelf = nil;
+    sharedInstance = nil;
     [super dealloc];
 }
 
@@ -127,7 +141,12 @@ void *AirInAppRefToSelf;
     [data setValue:[[transaction payment] productIdentifier] forKey:@"productId"];
     
     NSString* receiptString = [[[NSString alloc] initWithData:transaction.transactionReceipt encoding:NSUTF8StringEncoding] autorelease];
+    // Encode the receiptData for the itms receipt verification POST request.
+    NSString *jsonObjectString = [self encodeBase64:(uint8_t *)transaction.transactionReceipt.bytes
+                                             length:transaction.transactionReceipt.length];
+    
     [data setValue:receiptString forKey:@"receipt"];
+    [data setValue:jsonObjectString forKey:@"payload"];
     [data setValue:@"AppStore"   forKey:@"receiptType"];
     
     FREDispatchStatusEventAsync(AirInAppCtx, (uint8_t*)"PURCHASE_SUCCESS", (uint8_t*)[[data JSONString] UTF8String]);
@@ -230,14 +249,40 @@ void *AirInAppRefToSelf;
     FREDispatchStatusEventAsync(AirInAppCtx, (uint8_t*)"DEBUG", (uint8_t*) [@"removeTransaction" UTF8String] ); 
 }
 
+#pragma mark
+#pragma mark Base 64 encoding
+
+- (NSString *)encodeBase64:(const uint8_t *)input length:(NSInteger)length
+{
+    NSData * data = [NSData dataWithBytes:input length:length];
+    return [data base64EncodedString];
+}
+
+
+- (NSString *)decodeBase64:(NSString *)input length:(NSInteger *)length
+{
+    NSData * data = [NSData dataFromBase64String:input];
+    return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+}
+
+char* base64_encode(const void* buf, size_t size) {
+    size_t outputLength;
+    return NewBase64Encode(buf, size, NO, &outputLength);
+}
+
+void * base64_decode(const char* s, size_t * data_len)
+{
+    return NewBase64Decode(s, strlen(s), data_len);
+}
+
 
 @end
 
 
 DEFINE_ANE_FUNCTION(AirInAppPurchaseInit)
 {
-    [(AirInAppPurchase*)AirInAppRefToSelf registerObserver];
-    
+    [AirInAppPurchase sharedInstance];
+    [sharedInstance registerObserver];
     return nil;
 }
 
@@ -321,8 +366,8 @@ DEFINE_ANE_FUNCTION(getProductsInfo)
     SKProductsRequest* request = [[SKProductsRequest alloc] initWithProductIdentifiers:productsIdentifiers];
     
     
-    [(AirInAppPurchase*)AirInAppRefToSelf sendRequest:request AndContext:context];
-    
+//    [(AirInAppPurchase*)AirInAppRefToSelf sendRequest:request AndContext:context];
+    [[AirInAppPurchase sharedInstance] sendRequest:request AndContext:context];
     
     return nil;
 }
@@ -417,10 +462,11 @@ void AirInAppContextInitializer(void* extData, const uint8_t* ctxType, FREContex
     
     AirInAppCtx = ctx;
 
-    if ((AirInAppPurchase*)AirInAppRefToSelf == nil)
-    {
-        AirInAppRefToSelf = [[AirInAppPurchase alloc] init];
-    }
+//    if ((AirInAppPurchase*)AirInAppRefToSelf == nil)
+//    {
+//        AirInAppRefToSelf = [[AirInAppPurchase alloc] init];
+//    }
+    [AirInAppPurchase sharedInstance];
 
 }
 
