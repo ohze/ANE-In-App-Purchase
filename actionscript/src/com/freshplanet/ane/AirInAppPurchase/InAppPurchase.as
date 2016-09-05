@@ -88,21 +88,21 @@ package com.freshplanet.ane.AirInAppPurchase
 				trace("[InAppPurchase] removing product from queue", productId, receipt);
 				extCtx.call("removePurchaseFromQueue", productId, receipt);
 				
-				if (Capabilities.manufacturer.indexOf("iOS") > -1)
-				{
-					_iosPendingPurchases = _iosPendingPurchases.filter(function(jsonPurchase:String, index:int, purchases:Vector.<Object>):Boolean {
-						try
-						{
-							var purchase:Object = JSON.parse(jsonPurchase);
-							return JSON.stringify(purchase.receipt) != receipt;
-						} 
-						catch(error:Error)
-						{
-							trace("[InAppPurchase] Couldn't parse purchase: " + jsonPurchase);
-						}
-						return false;
-					});
-				}
+//				if (Capabilities.manufacturer.indexOf("iOS") > -1)
+//				{
+//					_iosPendingPurchases = _iosPendingPurchases.filter(function(jsonPurchase:String, index:int, purchases:Vector.<Object>):Boolean {
+//						try
+//						{
+//							var purchase:Object = JSON.parse(jsonPurchase);
+//							return JSON.stringify(purchase.receipt) != receipt;
+//						}
+//						catch(error:Error)
+//						{
+//							trace("[InAppPurchase] Couldn't parse purchase: " + jsonPurchase);
+//						}
+//						return false;
+//					});
+//				}
 			}
 		}
 		
@@ -206,10 +206,10 @@ package com.freshplanet.ane.AirInAppPurchase
 					e = new InAppPurchaseEvent(InAppPurchaseEvent.PRODUCT_INFO_ERROR);
 					break;
 				case "PURCHASE_SUCCESS":
-					if (Capabilities.manufacturer.indexOf("iOS") > -1)
-					{
-						_iosPendingPurchases.push(event.level);
-					}
+//					if (Capabilities.manufacturer.indexOf("iOS") > -1)
+//					{
+//						_iosPendingPurchases.push(event.level);
+//					}
 					e = new InAppPurchaseEvent(InAppPurchaseEvent.PURCHASE_SUCCESS, event.level);
 					break;
 				case "PURCHASE_ERROR":
