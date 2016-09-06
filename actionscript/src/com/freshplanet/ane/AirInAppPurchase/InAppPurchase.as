@@ -85,7 +85,7 @@ package com.freshplanet.ane.AirInAppPurchase {
          * PURCHASE_ERROR
          * @param productId
          */
-		public function makePurchase(productId:String):void {
+		public function makePurchase(productId:String, developerPayload: String = ""):void {
 
             if (!isSupported) {
 
@@ -93,8 +93,8 @@ package com.freshplanet.ane.AirInAppPurchase {
                 return;
             }
 
-            trace("[InAppPurchase] purchasing", productId);
-            _context.call("makePurchase", productId);
+            trace("[InAppPurchase] purchasing", productId, developerPayload);
+            _context.call("makePurchase", productId, developerPayload);
 		}
 
         /**

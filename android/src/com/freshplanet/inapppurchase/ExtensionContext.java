@@ -255,13 +255,14 @@ public class ExtensionContext extends FREContext {
         public FREObject call(FREContext ctx, FREObject[] args) {
 
             String purchaseId = getStringFromFREObject(args[0]);
+            String developerPayload = getStringFromFREObject(args[1]);
 
-            if (purchaseId == null)
-                _dispatchEvent(PURCHASE_ERROR, "null purchaseId");
+            if (purchaseId == null || developerPayload == null)
+                _dispatchEvent(PURCHASE_ERROR, "null purchaseId || developerPayload");
             else {
 
                 try {
-                    _iabHelper.launchPurchaseFlow(_freActivity, purchaseId, RC_REQUEST, _onIabPurchaseFinishedListener);
+                    _iabHelper.launchPurchaseFlow(_freActivity, purchaseId, RC_REQUEST, _onIabPurchaseFinishedListener, developerPayload);
                 }
                 catch (IabHelper.IabAsyncInProgressException exception) {
                     _dispatchEvent(PURCHASE_ERROR, exception.getMessage());
