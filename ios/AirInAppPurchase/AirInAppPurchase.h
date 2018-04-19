@@ -21,8 +21,6 @@
 #import "FlashRuntimeExtensions.h"
 #import "JSONKit.h"
 
-#define KNOWN_TRANSACTIONS_KEY              @"knownIAPTransactions"
-
 @interface AirInAppPurchase : NSObject <SKPaymentTransactionObserver, SKProductsRequestDelegate>
 
 - (void) sendRequest:(SKRequest*)request AndContext:(FREContext*)ctx;

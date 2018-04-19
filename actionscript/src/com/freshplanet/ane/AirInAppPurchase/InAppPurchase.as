@@ -84,7 +84,6 @@ package com.freshplanet.ane.AirInAppPurchase {
          * PURCHASE_SUCCESSFUL
          * PURCHASE_ERROR
          * @param productId
-         * @param developerPayload
          */
 		public function makePurchase(productId:String, developerPayload: String = ""):void {
 
