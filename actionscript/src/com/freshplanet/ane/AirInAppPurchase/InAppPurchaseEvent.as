@@ -42,10 +42,7 @@ package com.freshplanet.ane.AirInAppPurchase {
 
         public static const RESTORE_INFO_RECEIVED:String = "RESTORE_INFO_RECEIVED";
         public static const RESTORE_INFO_ERROR:String = "RESTORE_INFO_ERROR";
-
-		public static const PURCHASE_ALREADY_OWNED:String = "PURCHASE_ALREADY_OWNER";
-
-
+		
 		private var _data:String = null;
 
         /**
