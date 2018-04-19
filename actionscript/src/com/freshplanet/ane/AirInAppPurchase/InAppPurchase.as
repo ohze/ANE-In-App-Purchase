@@ -67,13 +67,15 @@ package com.freshplanet.ane.AirInAppPurchase {
          * PURCHASE_SUCCESSFUL
          * PURCHASE_ERROR
          * @param productId
+         * @param developerPayload
          */
-        public function makePurchase(productId:String):void {
+        public function makePurchase (productId:String, developerPayload: String = ""):void {
 
             if (!isSupported)
                 _dispatchEvent(InAppPurchaseEvent.PURCHASE_ERROR, "InAppPurchase not supported");
             else
-                _context.call("makePurchase", productId);
+                trace("[InAppPurchase] purchasing", productId, developerPayload);
+                _context.call("makePurchase", productId, developerPayload);
         }
 
         /**

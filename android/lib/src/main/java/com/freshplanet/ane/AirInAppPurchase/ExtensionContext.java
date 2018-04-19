@@ -128,6 +128,9 @@ public class ExtensionContext extends FREContext {
     private static final String RESTORE_INFO_RECEIVED = "RESTORE_INFO_RECEIVED";
     private static final String RESTORE_INFO_ERROR = "RESTORE_INFO_ERROR";
 
+    public static final String PURCHASE_ALREADY_OWNED = "PURCHASE_ALREADY_OWNER";
+
+
     private IabHelper.OnIabSetupFinishedListener _initLibListener = new IabHelper.OnIabSetupFinishedListener() {
         @Override
         public void onIabSetupFinished(IabResult result) {
@@ -157,7 +160,9 @@ public class ExtensionContext extends FREContext {
         @Override
         public void onIabPurchaseFinished(IabResult result, Purchase info) {
 
-            if (result.getResponse() == IabHelper.IABHELPER_USER_CANCELLED)
+            if (result.getResponse() == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED){
+                _dispatchEvent(PURCHASE_ALREADY_OWNED, result.getMessage());
+            }else if (result.getResponse() == IabHelper.IABHELPER_USER_CANCELLED)
                 _dispatchEvent(PURCHASE_ERROR, "RESULT_USER_CANCELED");
             else if (result.isFailure())
                 _dispatchEvent(PURCHASE_ERROR, result.getMessage());
@@ -243,7 +248,7 @@ public class ExtensionContext extends FREContext {
             }
 
             try {
-                _iabHelper.queryInventoryAsync(true, skusName, skusSubsName, _getProductsInfoListener);
+                _iabHelper.queryInventoryAsync(true, skusName, skusSubsName.isEmpty() ? null : skusSubsName, _getProductsInfoListener);
             }
             catch (IabHelper.IabAsyncInProgressException exception) {
                 _dispatchEvent(PRODUCT_INFO_ERROR, exception.getMessage());
@@ -258,13 +263,14 @@ public class ExtensionContext extends FREContext {
         public FREObject call(FREContext ctx, FREObject[] args) {
 
             String purchaseId = getStringFromFREObject(args[0]);
+            String developerPayload = getStringFromFREObject(args[1]);
 
-            if (purchaseId == null)
-                _dispatchEvent(PURCHASE_ERROR, "null purchaseId");
-            else {
+                if (purchaseId == null || developerPayload == null)
+                    _dispatchEvent(PURCHASE_ERROR, "null purchaseId || developerPayload");
+                else {
 
                 try {
-                    _iabHelper.launchPurchaseFlow(_freActivity, purchaseId, RC_REQUEST, _onIabPurchaseFinishedListener);
+                    _iabHelper.launchPurchaseFlow(_freActivity, purchaseId, RC_REQUEST, _onIabPurchaseFinishedListener, developerPayload);
                 }
                 catch (IabHelper.IabAsyncInProgressException exception) {
                     _dispatchEvent(PURCHASE_ERROR, exception.getMessage());
